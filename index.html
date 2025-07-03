@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warung Madrid - Hala Madrid!</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: rgba(240, 242, 245, 0.9); /* Semi-transparent background */
+        }
+        /* Pseudo-element for the blurred background image */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('https://e0.365dm.com/22/05/2048x1152/skysports-real-madrid-champions-league_5784531.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            filter: blur(8px);
+            z-index: -1;
+        }
+        .product-card-img {
+            aspect-ratio: 16 / 10;
+            object-fit: cover;
+        }
+        .cart-item-img {
+            width: 64px;
+            height: 64px;
+            object-fit: cover;
+            border-radius: 0.5rem;
+        }
+        /* Animation for modal */
+        #cart-modal-container {
+            transition: opacity 0.3s ease;
+        }
+        #cart-modal-content {
+            transition: transform 0.3s ease;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e2e8f0;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #a0aec0;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #718096;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <!-- Navbar -->
+    <nav id="navbar" class="sticky top-0 bg-white/80 backdrop-blur-lg z-30 shadow-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-3">
+                <!-- Logo and Brand Name -->
+                <a href="#" class="flex items-center gap-3 shrink-0">
+                    <img src="https://upload.wikimedia.org/wikipedia/en/thumb/5/56/Real_Madrid_CF.svg/1200px-Real_Madrid_CF.svg.png" alt="Logo Real Madrid" class="h-10">
+                    <span class="text-xl font-extrabold text-blue-900 hidden sm:block">Warung Madrid</span>
+                </a>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center gap-6">
+                    <a href="#" class="text-gray-600 hover:text-blue-900 font-semibold">Beranda</a>
+                    <a href="#produk-section" class="text-gray-600 hover:text-blue-900 font-semibold">Produk</a>
+                    <a href="#tentang-kami" class="text-gray-600 hover:text-blue-900 font-semibold">Tentang Kami</a>
+                </div>
+
+                <!-- Right side buttons -->
+                <div class="flex items-center gap-3">
+                    <button id="open-cart-btn" class="relative bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-3 rounded-lg transition-all duration-200">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span id="cart-count-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+                    </button>
+                    <!-- Mobile Menu Button -->
+                    <button id="mobile-menu-btn" class="md:hidden bg-blue-900 text-white p-2 rounded-lg">
+                        <i id="mobile-menu-icon" class="fa-solid fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white/95 backdrop-blur-lg">
+            <a href="#" class="block py-2 px-4 text-sm text-gray-600 hover:bg-gray-200">Beranda</a>
+            <a href="#produk-section" class="block py-2 px-4 text-sm text-gray-600 hover:bg-gray-200">Produk</a>
+            <a href="#tentang-kami" class="block py-2 px-4 text-sm text-gray-600 hover:bg-gray-200">Tentang Kami</a>
+        </div>
+    </nav>
+
+    <!-- Container Utama -->
+    <div class="container mx-auto p-4 md:p-6 mt-6">
+        <!-- Konten Produk -->
+        <main id="product-list-container">
+            <!-- Daftar produk akan dirender di sini -->
+        </main>
+
+        <!-- Tentang Kami Section -->
+        <section id="tentang-kami" class="my-16 scroll-mt-20">
+            <div class="bg-white/80 backdrop-blur-sm p-8 rounded-xl shadow-lg">
+                <h2 class="text-3xl font-bold text-blue-900 text-center mb-6">Tentang Warung Madrid</h2>
+                <p class="text-center text-gray-700 max-w-3xl mx-auto leading-relaxed">
+                    Warung Madrid didirikan oleh seorang Madridista sejati, untuk para Madridista lainnya. Semua produk di sini dipilih dengan hati untuk menemani hari-harimu mendukung klub kebanggaan.
+                </p>
+                <div class="mt-8 text-center">
+                    <div class="relative inline-block w-16 h-16">
+                        <img src="https://upload.wikimedia.org/wikipedia/en/thumb/4/47/FC_Barcelona_%28crest%29.svg/1200px-FC_Barcelona_%28crest%29.svg.png" alt="Logo Barcelona Dilarang" class="w-full h-full opacity-40 grayscale">
+                        <svg class="absolute top-0 left-0 w-full h-full text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </div>
+                    <p class="font-bold text-red-600 text-lg mt-2">
+                        Peringatan Keras: Decul dilarang beli!
+                    </p>
+                </div>
+                 <p class="text-center text-gray-700 max-w-3xl mx-auto leading-relaxed mt-8 font-semibold">
+                    ¡Hala Madrid!
+                </p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-blue-900 text-white">
+        <div class="container mx-auto py-12 px-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- About -->
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Warung Madrid</h3>
+                    <p class="text-blue-200">Toko kebutuhan untuk para pendukung Real Madrid di Indonesia. ¡Hala Madrid y Nada Más!</p>
+                </div>
+                <!-- Links -->
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Navigasi</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-blue-200 hover:text-white">Beranda</a></li>
+                        <li><a href="#produk-section" class="text-blue-200 hover:text-white">Produk</a></li>
+                        <li><a href="#tentang-kami" class="text-blue-200 hover:text-white">Tentang Kami</a></li>
+                        <li><button id="open-cart-footer-btn" class="text-blue-200 hover:text-white">Keranjang</button></li>
+                    </ul>
+                </div>
+                <!-- Contact -->
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Hubungi Kami</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center gap-3">
+                            <i class="fa-brands fa-whatsapp"></i>
+                            <a href="https://wa.me/6285282285522" target="_blank" class="text-blue-200 hover:text-white">0852-8228-5522</a>
+                        </li>
+                    </ul>
+                    <div class="flex gap-4 mt-4">
+                        <a href="#" class="text-blue-200 hover:text-white text-2xl"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="text-blue-200 hover:text-white text-2xl"><i class="fa-brands fa-tiktok"></i></a>
+                        <a href="#" class="text-blue-200 hover:text-white text-2xl"><i class="fa-brands fa-x-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-10 border-t border-blue-800 pt-6 text-center text-blue-300 text-sm">
+                &copy; <span id="footer-year"></span> Warung Madrid. All Rights Reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal Keranjang Belanja -->
+    <div id="cart-modal-container" class="fixed inset-0 z-40 hidden">
+        <div id="cart-modal-backdrop" class="absolute inset-0 bg-black bg-opacity-60"></div>
+        <div id="cart-modal-content" class="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl transform translate-x-full flex flex-col">
+            <!-- Konten keranjang akan dirender di sini -->
+        </div>
+    </div>
+
+    <!-- Template Loading -->
+    <template id="loading-template">
+        <div class="text-center py-20">
+            <i class="fa-solid fa-futbol fa-spin text-4xl text-blue-900"></i>
+            <p class="mt-4 text-slate-500">Memuat produk...</p>
+        </div>
+    </template>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // =================================
+            // KONFIGURASI & STATE
+            // =================================
+            const API_BASE_URL = 'https://rifkira.psl17.my.id/api';
+            const WHATSAPP_NUMBER = '6285282285522';
+            
+            const productListContainer = document.getElementById('product-list-container');
+            const cartCountBadge = document.getElementById('cart-count-badge');
+            
+            const cartModalContainer = document.getElementById('cart-modal-container');
+            const cartModalBackdrop = document.getElementById('cart-modal-backdrop');
+            const cartModalContent = document.getElementById('cart-modal-content');
+            
+            const loadingTemplate = document.getElementById('loading-template');
+
+            let allProducts = [];
+            let cart = [];
+
+            // =================================
+            // FUNGSI API
+            // =================================
+            const api = {
+                getProducts: async () => {
+                    const response = await fetch(`${API_BASE_URL}/products`);
+                    if (!response.ok) throw new Error('Gagal mengambil data produk.');
+                    const result = await response.json();
+                    return Array.isArray(result) ? result : [];
+                }
+            };
+
+            // =================================
+            // FUNGSI KERANJANG BELANJA (CART)
+            // =================================
+            const findProductById = (productId) => allProducts.find(p => p.id == productId);
+            
+            const addToCart = (productId) => {
+                const existingItem = cart.find(item => item.id == productId);
+                if (existingItem) {
+                    existingItem.quantity++;
+                } else {
+                    const product = findProductById(productId);
+                    if (product) cart.push({ ...product, quantity: 1 });
+                }
+                updateCartUI();
+            };
+            
+            const updateQuantity = (productId, change) => {
+                const item = cart.find(item => item.id == productId);
+                if (item) {
+                    item.quantity += change;
+                    if (item.quantity <= 0) cart = cart.filter(i => i.id != productId);
+                }
+                updateCartUI();
+            };
+
+            const calculateTotal = () => cart.reduce((total, item) => {
+                const price = item.final_price ?? item.price;
+                return total + (price * item.quantity);
+            }, 0);
+
+            // =================================
+            // FUNGSI RENDER UI
+            // =================================
+            const renderProducts = (products) => {
+                productListContainer.innerHTML = '';
+                if (products.length > 0) {
+                    productListContainer.innerHTML += `<div id="produk-section" class="scroll-mt-20">${renderProductSection('👕 Semua Produk', products)}</div>`;
+                } else {
+                    productListContainer.innerHTML = `<div class="text-center py-10 bg-white/80 backdrop-blur-sm rounded-lg shadow"><p class="text-slate-600 font-semibold">Maaf, belum ada produk yang tersedia.</p></div>`;
+                }
+            };
+            
+            const renderProductSection = (title, products) => `
+                <section class="mb-12">
+                    <h2 class="text-2xl font-bold mb-6 text-blue-900 p-3 bg-white/50 backdrop-blur-sm rounded-lg inline-block">${title}</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        ${products.map(renderProductCard).join('')}
+                    </div>
+                </section>
+            `;
+
+            const renderProductCard = (product) => {
+                const imageUrl = product.image_url ? API_BASE_URL.replace('/api', '') + product.image_url : 'https://placehold.co/600x400/e2e8f0/64748b?text=Gambar';
+                const priceDisplay = product.discount_percentage ? `
+                    <div>
+                        <p class="line-through text-sm text-gray-400">Rp${Number(product.original_price).toLocaleString('id-ID')}</p>
+                        <p class="text-xl font-bold text-red-600">Rp${Number(product.final_price).toLocaleString('id-ID')} 
+                            <span class="text-xs bg-red-100 text-red-600 font-semibold px-2 py-0.5 rounded-full ml-1">${product.discount_percentage}% OFF</span>
+                        </p>
+                    </div>` : `<p class="text-xl font-bold text-blue-900">Rp${Number(product.price).toLocaleString('id-ID')}</p>`;
+
+                return `
+                    <div class="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-1.5 transition-transform duration-300 flex flex-col group border-2 border-transparent hover:border-amber-400">
+                        <div class="overflow-hidden"><img src="${imageUrl}" alt="${product.name}" class="product-card-img w-full group-hover:scale-105 transition-transform duration-300"></div>
+                        <div class="p-4 flex flex-col flex-grow">
+                            <h3 class="text-lg font-bold text-blue-900">${product.name}</h3>
+                            <p class="text-slate-600 text-sm mt-1">${product.description}</p>
+                            <div class="mt-3 text-xs text-gray-500 space-y-1">
+                                <span class="block"><strong>Kategori:</strong> ${product.category || '-'}</span>
+                                <span class="block"><strong>Warna:</strong> ${product.color || '-'}</span>
+                                <span class="block"><strong>Ukuran:</strong> ${product.size || '-'}</span>
+                            </div>
+                            <div class="mt-auto pt-4">${priceDisplay}</div>
+                        </div>
+                        <div class="p-4 pt-2 grid grid-cols-2 gap-2">
+                            <button data-action="add-to-cart" data-id="${product.id}" class="w-full bg-blue-100 text-blue-800 hover:bg-blue-200 font-bold py-2 px-3 rounded-lg transition-colors duration-200 flex items-center justify-center text-sm"><i class="fa-solid fa-cart-plus mr-2"></i> Keranjang</button>
+                            <button data-action="buy-now" data-id="${product.id}" class="w-full bg-green-500 text-white hover:bg-green-600 font-bold py-2 px-3 rounded-lg transition-colors duration-200 flex items-center justify-center text-sm"><i class="fa-solid fa-bolt mr-2"></i> Beli</button>
+                        </div>
+                    </div>`;
+            };
+            
+            const updateCartUI = () => {
+                const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+                if (totalItems > 0) {
+                    cartCountBadge.textContent = totalItems;
+                    cartCountBadge.classList.remove('hidden');
+                } else {
+                    cartCountBadge.classList.add('hidden');
+                }
+                renderCartModalContent();
+            };
+            
+            const renderCartModalContent = () => {
+                const total = calculateTotal();
+                let contentHTML;
+                if (cart.length === 0) {
+                    contentHTML = `<div class="flex-grow flex flex-col items-center justify-center text-center p-6"><i class="fa-solid fa-ghost text-6xl text-slate-300 mb-4"></i><h3 class="text-xl font-bold text-blue-900">Keranjang Kosong</h3><p class="text-slate-500">Ayo borong produk Madridista!</p></div>`;
+                } else {
+                    contentHTML = `<div class="flex-grow overflow-y-auto p-6 space-y-4">${cart.map(item => `<div class="flex items-center gap-4"><img src="${item.image_url ? API_BASE_URL.replace('/api', '') + item.image_url : 'https://placehold.co/100x100/e2e8f0/64748b?text=Img'}" alt="${item.name}" class="cart-item-img"><div class="flex-grow"><p class="font-bold text-blue-900">${item.name}</p><p class="text-sm text-slate-500">Rp ${new Intl.NumberFormat('id-ID').format(item.final_price ?? item.price)}</p></div><div class="flex items-center gap-2"><button data-action="decrease-quantity" data-id="${item.id}" class="w-7 h-7 bg-slate-200 rounded-full hover:bg-slate-300 font-bold">-</button><span class="font-semibold">${item.quantity}</span><button data-action="increase-quantity" data-id="${item.id}" class="w-7 h-7 bg-slate-200 rounded-full hover:bg-slate-300 font-bold">+</button></div></div>`).join('')}</div><div class="p-6 border-t border-slate-200 bg-slate-50"><div class="flex justify-between items-center mb-4"><span class="text-lg font-bold text-blue-900">Total</span><span class="text-xl font-bold text-blue-900">Rp ${new Intl.NumberFormat('id-ID').format(total)}</span></div><button data-action="checkout" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center text-lg shadow-lg hover:shadow-xl"><i class="fa-brands fa-whatsapp mr-3"></i> Pesan via WhatsApp</button></div>`;
+                }
+                cartModalContent.innerHTML = `<header class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50"><h2 class="text-xl font-bold text-blue-900">Keranjang Belanja</h2><button data-action="close-cart" class="text-2xl text-slate-400 hover:text-slate-600">&times;</button></header>${contentHTML}`;
+            };
+
+            // =================================
+            // EVENT HANDLERS
+            // =================================
+            const handleCheckout = () => {
+                let message = "Hala Madrid! Saya ingin memesan produk dari Warung Madrid:\n\n";
+                cart.forEach(item => {
+                    const price = item.final_price ?? item.price;
+                    const itemTotal = new Intl.NumberFormat('id-ID').format(price * item.quantity);
+                    message += `• ${item.name} (${item.quantity}x) = Rp ${itemTotal}\n`;
+                });
+                const grandTotal = new Intl.NumberFormat('id-ID').format(calculateTotal());
+                message += `\n*Total Pesanan: Rp ${grandTotal}*\n\nTerima kasih!`;
+                window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
+            };
+
+            const handleBuyNow = (productId) => {
+                const product = findProductById(productId);
+                if (!product) return;
+                const price = product.final_price ?? product.price;
+                const itemTotal = new Intl.NumberFormat('id-ID').format(price);
+                let message = `Hala Madrid! Saya ingin membeli langsung produk ini:\n\n• ${product.name} (1x) = Rp ${itemTotal}\n\nTerima kasih!`;
+                window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
+            };
+
+            const toggleCartModal = (show) => {
+                if (show) {
+                    cartModalContainer.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
+                    setTimeout(() => {
+                        cartModalBackdrop.style.opacity = '1';
+                        cartModalContent.style.transform = 'translateX(0)';
+                    }, 10);
+                } else {
+                    cartModalBackdrop.style.opacity = '0';
+                    cartModalContent.style.transform = 'translateX(100%)';
+                    document.body.style.overflow = '';
+                    setTimeout(() => cartModalContainer.classList.add('hidden'), 300);
+                }
+            };
+
+            // =================================
+            // INISIALISASI & EVENT LISTENERS
+            // =================================
+            const initialize = async () => {
+                productListContainer.innerHTML = loadingTemplate.innerHTML;
+                try {
+                    const products = await api.getProducts();
+                    allProducts = products;
+                    renderProducts(products);
+                } catch (error) {
+                    productListContainer.innerHTML = `<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg" role="alert">${error.message}</div>`;
+                }
+                updateCartUI();
+                document.getElementById('footer-year').textContent = new Date().getFullYear();
+            };
+
+            // Event Delegation
+            document.body.addEventListener('click', (e) => {
+                const target = e.target.closest('button');
+                if (!target) return;
+                const action = target.dataset.action || target.id;
+                const id = target.dataset.id;
+                switch (action) {
+                    case 'add-to-cart': addToCart(id); break;
+                    case 'buy-now': handleBuyNow(id); break;
+                    case 'increase-quantity': updateQuantity(id, 1); break;
+                    case 'decrease-quantity': updateQuantity(id, -1); break;
+                    case 'checkout': handleCheckout(); break;
+                    case 'close-cart': toggleCartModal(false); break;
+                    case 'open-cart-btn':
+                    case 'open-cart-footer-btn':
+                        toggleCartModal(true); break;
+                }
+            });
+            
+            cartModalBackdrop.addEventListener('click', () => toggleCartModal(false));
+
+            // Mobile Menu Toggle
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuIcon = document.getElementById('mobile-menu-icon');
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                mobileMenuIcon.classList.toggle('fa-bars');
+                mobileMenuIcon.classList.toggle('fa-times');
+            });
+
+            // Close mobile menu when a link is clicked
+            mobileMenu.addEventListener('click', (e) => {
+                if (e.target.tagName === 'A') {
+                    mobileMenu.classList.add('hidden');
+                    mobileMenuIcon.classList.remove('fa-times');
+                    mobileMenuIcon.classList.add('fa-bars');
+                }
+            });
+
+            initialize();
+        });
+    </script>
+</body>
+</html>
