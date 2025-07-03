@@ -203,7 +203,8 @@
             // =================================
             // KONFIGURASI & STATE
             // =================================
-            const API_BASE_URL = 'https://rifkira.psl17.my.id/api';
+            const API_BASE_URL = 'https://fatimaazhr.psl17.my.id/api';
+            const IMAGE_BASE_URL = 'https://fatimaazhr.psl17.my.id/uploads/'; // URL dasar untuk gambar
             const WHATSAPP_NUMBER = '6285282285522';
             
             const productListContainer = document.getElementById('product-list-container');
@@ -226,6 +227,14 @@
                     const response = await fetch(`${API_BASE_URL}/products`);
                     if (!response.ok) throw new Error('Gagal mengambil data produk.');
                     const result = await response.json();
+                    // FIX: API Fatimah mengembalikan array langsung, bukan objek {data: ...}
+                    return Array.isArray(result) ? result : [];
+                },
+                getPopularProducts: async () => {
+                    const response = await fetch(`${API_BASE_URL}/products/popular/all`);
+                    if (!response.ok) throw new Error('Gagal mengambil data produk populer.');
+                    const result = await response.json();
+                    // FIX: API Fatimah mengembalikan array langsung, bukan objek {data: ...}
                     return Array.isArray(result) ? result : [];
                 }
             };
@@ -256,18 +265,21 @@
             };
 
             const calculateTotal = () => cart.reduce((total, item) => {
-                const price = item.final_price ?? item.price;
-                return total + (price * item.quantity);
+                return total + (item.price * item.quantity);
             }, 0);
 
             // =================================
             // FUNGSI RENDER UI
             // =================================
-            const renderProducts = (products) => {
+            const renderProducts = (products, popularProducts) => {
                 productListContainer.innerHTML = '';
-                if (products.length > 0) {
-                    productListContainer.innerHTML += `<div id="produk-section" class="scroll-mt-20">${renderProductSection('👕 Semua Produk', products)}</div>`;
-                } else {
+                if (popularProducts && popularProducts.length > 0) {
+                    productListContainer.innerHTML += `<div id="produk-section" class="scroll-mt-20">${renderProductSection('⭐ Produk Populer', popularProducts)}</div>`;
+                }
+                if (products && products.length > 0) {
+                    productListContainer.innerHTML += `<div class="scroll-mt-20">${renderProductSection('👕 Semua Produk', products)}</div>`;
+                }
+                if ((!products || products.length === 0) && (!popularProducts || popularProducts.length === 0)) {
                     productListContainer.innerHTML = `<div class="text-center py-10 bg-white/80 backdrop-blur-sm rounded-lg shadow"><p class="text-slate-600 font-semibold">Maaf, belum ada produk yang tersedia.</p></div>`;
                 }
             };
@@ -282,26 +294,16 @@
             `;
 
             const renderProductCard = (product) => {
-                const imageUrl = product.image_url ? API_BASE_URL.replace('/api', '') + product.image_url : 'https://placehold.co/600x400/e2e8f0/64748b?text=Gambar';
-                const priceDisplay = product.discount_percentage ? `
-                    <div>
-                        <p class="line-through text-sm text-gray-400">Rp${Number(product.original_price).toLocaleString('id-ID')}</p>
-                        <p class="text-xl font-bold text-red-600">Rp${Number(product.final_price).toLocaleString('id-ID')} 
-                            <span class="text-xs bg-red-100 text-red-600 font-semibold px-2 py-0.5 rounded-full ml-1">${product.discount_percentage}% OFF</span>
-                        </p>
-                    </div>` : `<p class="text-xl font-bold text-blue-900">Rp${Number(product.price).toLocaleString('id-ID')}</p>`;
+                // FIX: Gunakan IMAGE_BASE_URL + nama file dari 'photo'
+                const imageUrl = product.photo ? `${IMAGE_BASE_URL}${product.photo}` : 'https://placehold.co/600x400/e2e8f0/64748b?text=Gambar';
+                const priceDisplay = `<p class="text-xl font-bold text-blue-900">Rp${Number(product.price).toLocaleString('id-ID')}</p>`;
 
                 return `
                     <div class="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-1.5 transition-transform duration-300 flex flex-col group border-2 border-transparent hover:border-amber-400">
                         <div class="overflow-hidden"><img src="${imageUrl}" alt="${product.name}" class="product-card-img w-full group-hover:scale-105 transition-transform duration-300"></div>
                         <div class="p-4 flex flex-col flex-grow">
                             <h3 class="text-lg font-bold text-blue-900">${product.name}</h3>
-                            <p class="text-slate-600 text-sm mt-1">${product.description}</p>
-                            <div class="mt-3 text-xs text-gray-500 space-y-1">
-                                <span class="block"><strong>Kategori:</strong> ${product.category || '-'}</span>
-                                <span class="block"><strong>Warna:</strong> ${product.color || '-'}</span>
-                                <span class="block"><strong>Ukuran:</strong> ${product.size || '-'}</span>
-                            </div>
+                            <p class="text-slate-600 text-sm mt-1">${product.description || '<i>Produk terbaik untuk Madridista.</i>'}</p>
                             <div class="mt-auto pt-4">${priceDisplay}</div>
                         </div>
                         <div class="p-4 pt-2 grid grid-cols-2 gap-2">
@@ -328,7 +330,10 @@
                 if (cart.length === 0) {
                     contentHTML = `<div class="flex-grow flex flex-col items-center justify-center text-center p-6"><i class="fa-solid fa-ghost text-6xl text-slate-300 mb-4"></i><h3 class="text-xl font-bold text-blue-900">Keranjang Kosong</h3><p class="text-slate-500">Ayo borong produk Madridista!</p></div>`;
                 } else {
-                    contentHTML = `<div class="flex-grow overflow-y-auto p-6 space-y-4">${cart.map(item => `<div class="flex items-center gap-4"><img src="${item.image_url ? API_BASE_URL.replace('/api', '') + item.image_url : 'https://placehold.co/100x100/e2e8f0/64748b?text=Img'}" alt="${item.name}" class="cart-item-img"><div class="flex-grow"><p class="font-bold text-blue-900">${item.name}</p><p class="text-sm text-slate-500">Rp ${new Intl.NumberFormat('id-ID').format(item.final_price ?? item.price)}</p></div><div class="flex items-center gap-2"><button data-action="decrease-quantity" data-id="${item.id}" class="w-7 h-7 bg-slate-200 rounded-full hover:bg-slate-300 font-bold">-</button><span class="font-semibold">${item.quantity}</span><button data-action="increase-quantity" data-id="${item.id}" class="w-7 h-7 bg-slate-200 rounded-full hover:bg-slate-300 font-bold">+</button></div></div>`).join('')}</div><div class="p-6 border-t border-slate-200 bg-slate-50"><div class="flex justify-between items-center mb-4"><span class="text-lg font-bold text-blue-900">Total</span><span class="text-xl font-bold text-blue-900">Rp ${new Intl.NumberFormat('id-ID').format(total)}</span></div><button data-action="checkout" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center text-lg shadow-lg hover:shadow-xl"><i class="fa-brands fa-whatsapp mr-3"></i> Pesan via WhatsApp</button></div>`;
+                    contentHTML = `<div class="flex-grow overflow-y-auto p-6 space-y-4">${cart.map(item => {
+                        const imageUrl = item.photo ? `${IMAGE_BASE_URL}${item.photo}` : 'https://placehold.co/100x100/e2e8f0/64748b?text=Img';
+                        return `<div class="flex items-center gap-4"><img src="${imageUrl}" alt="${item.name}" class="cart-item-img"><div class="flex-grow"><p class="font-bold text-blue-900">${item.name}</p><p class="text-sm text-slate-500">Rp ${new Intl.NumberFormat('id-ID').format(item.price)}</p></div><div class="flex items-center gap-2"><button data-action="decrease-quantity" data-id="${item.id}" class="w-7 h-7 bg-slate-200 rounded-full hover:bg-slate-300 font-bold">-</button><span class="font-semibold">${item.quantity}</span><button data-action="increase-quantity" data-id="${item.id}" class="w-7 h-7 bg-slate-200 rounded-full hover:bg-slate-300 font-bold">+</button></div></div>`
+                    }).join('')}</div><div class="p-6 border-t border-slate-200 bg-slate-50"><div class="flex justify-between items-center mb-4"><span class="text-lg font-bold text-blue-900">Total</span><span class="text-xl font-bold text-blue-900">Rp ${new Intl.NumberFormat('id-ID').format(total)}</span></div><button data-action="checkout" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center text-lg shadow-lg hover:shadow-xl"><i class="fa-brands fa-whatsapp mr-3"></i> Pesan via WhatsApp</button></div>`;
                 }
                 cartModalContent.innerHTML = `<header class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50"><h2 class="text-xl font-bold text-blue-900">Keranjang Belanja</h2><button data-action="close-cart" class="text-2xl text-slate-400 hover:text-slate-600">&times;</button></header>${contentHTML}`;
             };
@@ -339,8 +344,7 @@
             const handleCheckout = () => {
                 let message = "Hala Madrid! Saya ingin memesan produk dari Warung Madrid:\n\n";
                 cart.forEach(item => {
-                    const price = item.final_price ?? item.price;
-                    const itemTotal = new Intl.NumberFormat('id-ID').format(price * item.quantity);
+                    const itemTotal = new Intl.NumberFormat('id-ID').format(item.price * item.quantity);
                     message += `• ${item.name} (${item.quantity}x) = Rp ${itemTotal}\n`;
                 });
                 const grandTotal = new Intl.NumberFormat('id-ID').format(calculateTotal());
@@ -351,8 +355,7 @@
             const handleBuyNow = (productId) => {
                 const product = findProductById(productId);
                 if (!product) return;
-                const price = product.final_price ?? product.price;
-                const itemTotal = new Intl.NumberFormat('id-ID').format(price);
+                const itemTotal = new Intl.NumberFormat('id-ID').format(product.price);
                 let message = `Hala Madrid! Saya ingin membeli langsung produk ini:\n\n• ${product.name} (1x) = Rp ${itemTotal}\n\nTerima kasih!`;
                 window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
             };
@@ -379,9 +382,16 @@
             const initialize = async () => {
                 productListContainer.innerHTML = loadingTemplate.innerHTML;
                 try {
-                    const products = await api.getProducts();
-                    allProducts = products;
-                    renderProducts(products);
+                    const [products, popularProducts] = await Promise.all([
+                        api.getProducts(),
+                        api.getPopularProducts()
+                    ]);
+                    // Gabungkan semua produk untuk pencarian dan pastikan tidak ada duplikat
+                    const allProductMap = new Map();
+                    [...popularProducts, ...products].forEach(p => allProductMap.set(p.id, p));
+                    allProducts = Array.from(allProductMap.values());
+                    
+                    renderProducts(products, popularProducts);
                 } catch (error) {
                     productListContainer.innerHTML = `<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg" role="alert">${error.message}</div>`;
                 }
